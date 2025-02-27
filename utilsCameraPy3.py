@@ -577,15 +577,15 @@ class Camera:
         r_distorted[~positive_mask] = -s * np.cos(t) + s * np.sqrt(3) * np.sin(t)
 
         return metric_image_coord * r_distorted / r_u
-        
+
     def _undistort_division(self, z_r):
         """
         Undistort centered image coordinate(s) following the division model.
         :param z_r: radially distorted centered image coordinate(s)
         :type z_r: numpy.ndarray, shape(2, n)
-        
+
         :return: linear image coordinate(s)
-        :rtype: numpy.ndarray, shape(2, n)        
+        :rtype: numpy.ndarray, shape(2, n)
         """
         assert (-1 < self.division_lambda < 1)
         return (1 - self.division_lambda) / \
@@ -602,7 +602,7 @@ class Camera:
         z_hat = 2 * z_l / (1 - self.division_lambda)
         return z_hat / (1 + np.sqrt(1 + self.division_lambda * np.sum(z_hat ** 2, axis=0) /
                                     np.sum(self.division_z_n ** 2, axis=0)))
-    
+
     def get_focal_length(self):
         """
         Get camera focal length.
@@ -821,15 +821,15 @@ def nview_linear_triangulation(cameras, correspondences,weights = None):
 
         return w*np.vstack((uv[0] * P[2, :] - P[0, :],
                           uv[1] * P[2, :] - P[1, :]))
-    
-    # testing weighted least squares
+
+    # testing weighted least squares(カメラごとの重みを設定している場合はその重みを使用)
     if weights is None:
         w = np.ones(len(cameras))
         weights = [1 for i in range(len(cameras))]
     else:
         w = [np.nan_to_num(wi,nan=0.5) for wi in weights] # turns nan confidences into 0.5
-    
-    
+
+
     D = np.zeros((len(cameras) * 2, 4))
     for cam_idx, cam, uv in zip(range(len(cameras)), cameras, correspondences.T):
         D[cam_idx * 2:cam_idx * 2 + 2, :] = _construct_D_block(cam.P, uv,w=w[cam_idx])
@@ -840,7 +840,7 @@ def nview_linear_triangulation(cameras, correspondences,weights = None):
     if np.count_nonzero(weights)<2:
         # return 0s if there aren't at least 2 cameras with confidence
         pt3d = np.zeros_like(pt3d)
-        conf = 0 
+        conf = 0
     else:
         # if all nan slice (all cameras were splined)
         if all(np.isnan(weightArray[weightArray!=0])):

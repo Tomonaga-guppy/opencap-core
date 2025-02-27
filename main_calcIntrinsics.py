@@ -6,7 +6,7 @@
     location for future use of this phone model.
 """
 
-import os 
+import os
 import yaml
 import pickle
 
@@ -26,7 +26,7 @@ loadTrialInfo = False # Load previous trial names and CheckerBoardParams from fi
 saveIntrinsicsForDeployment = True
 
 deployedFolderNames = ['Deployed_720_60fps','Deployed'] # both folder names if want to keep the detailed folder
-    
+
 # %% Paths to data folder for local testing.
 dataDir = os.path.join(getDataDirectory(),'Data')
 sessionDir = os.path.join(dataDir,'IntrinsicCaptures',sessionName)
@@ -58,20 +58,20 @@ if loadTrialInfo:
                         'squareSize': trialInfo['squareSize']}
     else:
         raise Exception('trialFile doesn''t exist. Enter trials and CheckerBoardParams manually.')
-        
-     
+
+
 # Compute average intrinsic values from multiple trials of same camera
 CamParamsAverage, CamParamList, intrinsicComparisons, cameraModel = computeAverageIntrinsics(sessionDir,trials,CheckerBoardParams,nImages=50)
 
 
-# Save intrinsics from first camera for deployement 
+# Save intrinsics from first camera for deployement
 if saveIntrinsicsForDeployment:
     for deployedFolderName in deployedFolderNames:
         permIntrinsicDir = os.path.join(os.getcwd(), 'CameraIntrinsics',
                                     cameraModel,deployedFolderName)
         saveCameraParameters(os.path.join(
                 permIntrinsicDir, 'cameraIntrinsics.pickle'), CamParamsAverage)
-        
+
 # Save trial info
 trialInfo = {'trials':trials,
              'nSquaresWidth':CheckerBoardParams['dimensions'][0],
@@ -80,6 +80,6 @@ trialInfo = {'trials':trials,
              'cameraModel':cameraModel,}
 with open(trialFile, 'w') as f:
     yaml.dump(trialInfo,f)
-    
+
 with open(intrinsicComparisonFile, 'wb') as f:
     pickle.dump(intrinsicComparisons,f)
